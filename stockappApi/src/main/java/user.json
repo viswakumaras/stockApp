@@ -1,0 +1,4 @@
+[{"role":"customer","pass":"kumar93","name":"kumar"},{"role":"customer","pass":"pass","name":"praveen"},
+  {"role":"admin","pass":"admin123","name":"admin"},{"role":"customer","pass":"pass","name":"viswa"},
+  {"role":"customer","pass":"pass","name":"viswa2"},{"role":"customer","pass":"new","name":"new"},
+  {"role":"customer","pass":"new2","name":"new2"}]
