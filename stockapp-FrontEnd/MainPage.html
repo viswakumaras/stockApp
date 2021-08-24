@@ -1,0 +1,218 @@
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>home</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#" class="fs-1" class="font-family-monospace">Stocks  </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarScroll">
+        <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#"></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"></a>
+          </li>
+       
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"></a>
+          </li>
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+          
+
+          
+          <button class="btn btn-primary" class="span4" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" onclick="checkCart()" aria-controls="offcanvasRight">Your Cart</button>
+
+          <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+            <div class="offcanvas-header">
+              <h5 id="offcanvasRightLabel">Your Cart</h5>
+              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              
+              <div id="cart">
+
+              </div>
+            </div>
+
+            <button class="btn btn-primary" type="button" onclick="checkOut()">CheckOut All</button>
+          </div>
+
+          <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" onclick="checkOrderHistory()" aria-controls="offcanvasWithBothOptions">Order History</button>
+
+
+          <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Order History</h5>
+              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              <div id="History">
+
+              </div>
+            </div>
+          </div>
+      
+          <button class="btn btn-primary" type="button" onclick="logOut()">Log Out</button>
+        </form>
+      </div>
+    </div>
+  
+  </nav>
+    <table class="table" id='transaction-table'>
+        <thead>
+          <tr>
+            <th scope="col">Product ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Price</th>
+            <th scope="col">Available</th>
+            <th scope="col">Add to cart</th>
+          </tr>
+        </thead>
+        <tbody id='box'>
+
+        </tbody>
+    </table>
+   
+<script>
+async function show(){
+let res =await  axios.get('http://localhost:8080/stockappApi/products/view');
+
+let product=res.data;
+
+    console.log(product);
+
+    var products = "<table border='1|1'>";
+    for (var i = 0; i < product.length; i++) {
+     products+="<tr>";
+   
+     products+="<td>"+product[i].id+"</td>";
+     products+="<td>"+product[i].itemName+"</td>";
+     products+="<td>"+product[i].category+"</td>";
+     products+="<td>"+product[i].price+"</td>";
+     products+="<td>"+product[i].available+"</td>";
+
+     products+="<td>"+"<button id="+product[i].id+" class='btn btn-primary' onclick=addToCart("+product[i].id+")>"+"Click to add"+"</button>"+"</td>";
+    
+     products+="</tr>";
+     }
+
+     products+="</table>";
+   document.getElementById("box").innerHTML = products;
+    }
+
+    show();
+    let ss=document.getElementById("1");
+  //  console.log(ss.value);
+
+
+  async  function addToCart(user){
+    console.log("id:"+user);
+      let res =   await  axios.get('http://localhost:8080/stockappApi/orders/id',{
+        params: {
+          id:user.toString(),
+          userId:localStorage.getItem("userId")
+        }
+      });
+     
+       location.reload();
+      console.log(localStorage.getItem("userId"));
+    }
+
+
+    async function checkCart(){
+      let res= await axios.get('http://localhost:8080/stockappApi/orders/cart',{
+
+        params:{
+          id:localStorage.getItem("userId")
+        }
+      });
+
+      let order=res.data;
+      console.log(order[0]);
+      let orders="<div>";
+      for(i=0;i<res.data.length;i++){
+
+
+
+        orders+="<div class='card' style='width: 18rem;''>"+
+       "<div class='card-body'>"+
+        "<h5 class='card-title'> OrderID-"+order[i].OrderId+"</h5>"+
+      "<h6 class='card-subtitle mb-2 text-muted'>Prduct name</h6>"+
+      "<p class='card-text'>"+order[i].productName+"</p>"+
+      "<h6 class='card-subtitle mb-2 text-muted'>Quantity</h6>"+
+     "<p class='card-text'>"+order[i].quantity+"</p>"+" </div> </div>"
+      }
+
+      orders+="</div>";
+
+      document.getElementById("cart").innerHTML=orders;
+    }
+
+    async function checkOrderHistory(){
+     
+      let res= await axios.get('http://localhost:8080/stockappApi/orders/checkout',{
+
+        params:{
+          id:localStorage.getItem("userId")
+        }
+      });
+
+      order=res.data;
+
+     // console.log(order[0].productName);
+      let orders="<div>";
+      for(i=0;i<res.data.length;i++){
+
+        orders+="<div class='card' style='width: 18rem;''>"+
+       "<div class='card-body'>"+
+        "<h5 class='card-title'> Order ID-"+order[i].OrderId+"</h5>"+
+      "<h6 class='card-subtitle mb-2 text-muted'>Prduct name</h6>"+
+      "<p class='card-text'>"+order[i].productName+"</p>"+
+      "<h6 class='card-subtitle mb-2 text-muted'>Quantity</h6>"+
+     "<p class='card-text'>"+order[i].quantity+"</p>"+" </div> </div>"
+      }
+
+      orders+="</div>";
+
+      document.getElementById("History").innerHTML=orders;
+    }
+
+
+    async function checkOut(){
+      let res= await axios.get('http://localhost:8080/stockappApi/orders/changetocheckout',{  
+        params:{
+          id:localStorage.getItem("userId")
+            }
+           });
+           
+  
+               alert("Items are checkedOut From Cart");
+             location.reload();
+          }
+
+          function logOut(){
+            localStorage.clear();
+            window.location.href="homepage.html";
+          }
+
+</script>
+
+
+
+
+</body>
+</html>
